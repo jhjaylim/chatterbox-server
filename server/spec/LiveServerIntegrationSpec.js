@@ -74,5 +74,37 @@ describe('server', function() {
     });
   });
 
+  //make sure the message is not modified such as space replaced with +
+  it('Should not modify the original message from client', function(done) {
+    
+    var requestParams = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        message: 'Do <my/> bidding!'}
+    };
+
+    var requestMessage = requestParams.json;
+    request(requestParams, function( error, response, body) {
+
+      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+      //expect(response.statusCode).to.equal(404);
+        var messages = JSON.parse(body).results;
+        var lastMessage = messages[messages.length - 1];
+        expectedMessage = {
+          username: lastMessage.username,
+          message: lastMessage.message
+        };
+        
+        expect(expectedMessage).to.eql(requestMessage);
+        done();
+      });
+
+    });
+
+  });
+  //make sure the database grew appropriately after adding certain number of messages
+  //
+
 
 });

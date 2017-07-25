@@ -67,11 +67,16 @@ var app = {
       contentType: 'application/json',
       success: function(data) {
         // Don't bother if we have nothing to work with
-        if (!data.results || !data.results.length) { return; }
+        
+        if (!data.results || !data.results.length) {
+          app.renderMessages(data.results);
+          return;
+
+        }
 
         // Store messages for caching later
         app.messages = data.results;
-
+        
         // Get the last message
         var mostRecentMessage = data.results[data.results.length - 1];
 
@@ -81,6 +86,7 @@ var app = {
           app.renderRoomList(data.results);
 
           // Update the UI with the fetched messages
+          
           app.renderMessages(data.results, animate);
 
           // Store the ID of the most recent message

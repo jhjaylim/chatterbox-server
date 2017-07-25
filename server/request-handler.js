@@ -13,7 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var _ = require('underscore');
 
-var database = [{username: 'Jay', message: 'likes paring with steve'}];
+var database = [];
 
 var requestHandler = function(request, response) {
 
@@ -54,24 +54,32 @@ var requestHandler = function(request, response) {
     });
     request.addListener('end', () => {
 
-    // note! escape and parse
-      data = _.escape(data);
-      
-      data = data.split('+').join(' ');
+      try {
+        data = JSON.parse(data);
+        var message = data;
+        message.text = message.message;
+      } catch (err) {
+        console.log('Data was not JSON parseable string');
+        // note! escape and parse
+        data = _.escape(data);
+        data = decodeURIComponent(data);
+        console.log(data);
+        data = data.split('+').join(' ');
 
-      data = data.split('&amp;');
-      var message = {};
-      data.forEach(function(ar) {
-        var tempMessage = ar.split('=');
-        message[tempMessage[0]] = tempMessage[1];
+        data = data.split('&amp;');
+        var message = {};
+        data.forEach(function(ar) {
+          var tempMessage = ar.split('=');
+          message[tempMessage[0]] = tempMessage[1];
 
-      });
+        });
+        message.text = _.unescape(message.text);
+        message.message = message.text;
 
-      message.message = message.text;
+      }
       message.objectId = new Date();
       
-      database.push(message);
-    
+      database.push(message);    
     // at this point, `body` has the entire request body stored in it as a string
     });  
 
@@ -119,7 +127,7 @@ var requestHandler = function(request, response) {
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key', 
   'access-control-max-age': 10 // Seconds.
 };
 
