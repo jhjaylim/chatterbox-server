@@ -40,6 +40,7 @@ describe('Node Server Request Listener Function', function() {
     handler.requestHandler(req, res);
 
     var parsedBody = JSON.parse(res._data);
+    //console.log(parsedBody);
     expect(parsedBody).to.be.an('object');
     expect(res._ended).to.equal(true);
   });
@@ -67,6 +68,7 @@ describe('Node Server Request Listener Function', function() {
     handler.requestHandler(req, res);
 
     // Expect 201 Created response status
+   
     expect(res._responseCode).to.equal(201);
 
     // Testing for a newline isn't a valid test
