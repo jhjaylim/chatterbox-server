@@ -46,7 +46,7 @@ var app = {
       contentType: 'application/json',
       success: function (data) {
         // Clear messages input
-        console.log("success!!!!1!!!!!!!!!!!!!");
+        
         app.$message.val('');
 
         // Trigger a fetch to update the messages, pass true to animate
@@ -59,6 +59,7 @@ var app = {
   },
 
   fetch: function(animate) {
+
     $.ajax({
       url: app.server,
       type: 'GET',
@@ -85,6 +86,7 @@ var app = {
           // Store the ID of the most recent message
           app.lastMessageId = mostRecentMessage.objectId;
         }
+    
       },
       error: function(error) {
         console.error('chatterbox: Failed to fetch messages', error);

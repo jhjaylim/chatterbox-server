@@ -11,7 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var database = [{username: "Jay", message: "likes paring with steve"}];
+var _ = require('underscore');
+
+var database = [{username: 'Jay', message: 'likes paring with steve'}];
 
 var requestHandler = function(request, response) {
 
@@ -51,14 +53,24 @@ var requestHandler = function(request, response) {
       data += chunk;
     });
     request.addListener('end', () => {
-    
+
     // note! escape and parse
+      data = _.escape(data);
       
-      data = JSON.parse(data);
+      data = data.split('+').join(' ');
+
+      data = data.split('&amp;');
+      var message = {};
+      data.forEach(function(ar) {
+        var tempMessage = ar.split('=');
+        message[tempMessage[0]] = tempMessage[1];
+
+      });
+
+      message.message = message.text;
+      message.objectId = new Date();
       
-      data.text = data.message;
-      
-      database.push(data);
+      database.push(message);
     
     // at this point, `body` has the entire request body stored in it as a string
     });  
