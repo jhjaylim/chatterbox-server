@@ -11,7 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var database = [];
+var database = [{username: "Jay", message: "likes paring with steve"}];
 
 var requestHandler = function(request, response) {
 
@@ -31,13 +31,10 @@ var requestHandler = function(request, response) {
   // console.logs in your code.
 
   var myRequest = request;
-  
-  
- 
+
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   
-  
-  
+
   // The outgoing status.
   var statusCode = 200;
 
@@ -46,7 +43,7 @@ var requestHandler = function(request, response) {
   }
 
   if (request.method === 'POST' && statusCode !== 404 ) {
-
+    
     statusCode = 201;
 
     var data = '';
@@ -54,8 +51,13 @@ var requestHandler = function(request, response) {
       data += chunk;
     });
     request.addListener('end', () => {
-    // data =  + data + '"';
+    
+    // note! escape and parse
+      
       data = JSON.parse(data);
+      
+      data.text = data.message;
+      
       database.push(data);
     
     // at this point, `body` has the entire request body stored in it as a string

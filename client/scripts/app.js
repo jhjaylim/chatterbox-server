@@ -43,8 +43,10 @@ var app = {
       url: app.server,
       type: 'POST',
       data: message,
+      contentType: 'application/json',
       success: function (data) {
         // Clear messages input
+        console.log("success!!!!1!!!!!!!!!!!!!");
         app.$message.val('');
 
         // Trigger a fetch to update the messages, pass true to animate
@@ -60,7 +62,7 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      data: { order: '-createdAt' },
+      data: {},
       contentType: 'application/json',
       success: function(data) {
         // Don't bother if we have nothing to work with
@@ -162,7 +164,7 @@ var app = {
     }
 
     var $message = $('<br><span/>');
-    $message.text(message.text).appendTo($chat);
+    $message.text(message.message).appendTo($chat); // we changed text to message on message object
 
     // Add the message to the UI
     app.$chats.append($chat);
