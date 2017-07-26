@@ -49,28 +49,17 @@ var requestHandler = function(request, response) {
         query = request.url.slice(request.url.indexOf('?') + 1);
         query = query.split('?');
         query = query.map(function(ar) {
-
           return ar.split('=');
-
         });
-
         query.forEach(function(ar) {
           queryObject[ar[0]] = ar[1]; 
-        
         });
-      
-        
-        
       } else {
         statusCode = 404;
       }
-
     } else { 
       statusCode = 404;
     }
-
-
-
   }
 
   if (request.method === 'POST' && statusCode !== 404 ) {
@@ -140,27 +129,19 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   var resultsArray = _.clone(database);
-  console.log(JSON.stringify(queryObject));
+  
   if ('order' in queryObject) {
     
     if (queryObject['order'][0] === '-') {
       
-      console.log('bofore-------', resultsArray);
       resultsArray.sort(function(a, b) {
-        console.log('a created at', a.createdAt);
-        console.log('b created at', b.createdAt);
         return a.createdAt < b.createdAt;
-
       });
-      
-      console.log('this is the sorted ', resultsArray);   
     } 
   } 
 
   response.end(JSON.stringify({results: resultsArray})); 
   
-
-    
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
