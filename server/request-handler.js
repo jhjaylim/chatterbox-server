@@ -39,9 +39,38 @@ var requestHandler = function(request, response) {
 
   // The outgoing status.
   var statusCode = 200;
-
+  var query;
+  var queryObject = {};  
   if (request.url !== '/classes/messages') {
-    statusCode = 404;
+    
+    if (request.method === 'OPTIONS' || request.method === 'GET') {
+      if (request.url.slice(0, request.url.indexOf('?')) === '/classes/messages') {
+        statusCode = 200;
+        query = request.url.slice(request.url.indexOf('?') + 1);
+        query = query.split('?');
+        query = query.map(function(ar) {
+
+          return ar.split('=');
+
+        });
+
+        query.forEach(function(ar) {
+          queryObject[ar[0]] = ar[1]; 
+        
+        });
+      
+        
+        
+      } else {
+        statusCode = 404;
+      }
+
+    } else { 
+      statusCode = 404;
+    }
+
+
+
   }
 
   if (request.method === 'POST' && statusCode !== 404 ) {
@@ -63,11 +92,12 @@ var requestHandler = function(request, response) {
         // note! escape and parse
         data = _.escape(data);
         data = decodeURIComponent(data);
-        console.log(data);
+        
         data = data.split('+').join(' ');
 
         data = data.split('&amp;');
         var message = {};
+        
         data.forEach(function(ar) {
           var tempMessage = ar.split('=');
           message[tempMessage[0]] = tempMessage[1];
@@ -77,7 +107,7 @@ var requestHandler = function(request, response) {
         message.message = message.text;
 
       }
-      message.objectId = new Date();
+      message.objectId = message.createdAt = new Date();
       
       database.push(message);    
     // at this point, `body` has the entire request body stored in it as a string
@@ -109,8 +139,26 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
+  var resultsArray = _.clone(database);
+  console.log(JSON.stringify(queryObject));
+  if ('order' in queryObject) {
+    
+    if (queryObject['order'][0] === '-') {
+      
+      console.log('bofore-------', resultsArray);
+      resultsArray.sort(function(a, b) {
+        console.log('a created at', a.createdAt);
+        console.log('b created at', b.createdAt);
+        return a.createdAt < b.createdAt;
 
-  response.end(JSON.stringify({results: database})); 
+      });
+      
+      console.log('this is the sorted ', resultsArray);   
+    } 
+  } 
+
+  response.end(JSON.stringify({results: resultsArray})); 
+  
 
     
 };
@@ -129,6 +177,7 @@ var defaultCorsHeaders = {
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key', 
   'access-control-max-age': 10 // Seconds.
+  
 };
 
 module.exports.requestHandler = requestHandler;

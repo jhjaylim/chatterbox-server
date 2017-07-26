@@ -103,8 +103,104 @@ describe('server', function() {
     });
 
   });
+  //should get reverse chronological results with a order -createdAt query
+
+  it('Should reverse order of results if order is -createAt', function(done) {
+    var requestParams1 = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        message: 'Hello!'}
+    };
+    var message1 = requestParams1.json;
+    request(requestParams1, function( error, response, body) {
+    });
+
+    var requestParams2 = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        message: 'World!'}
+    };
+
+    setTimeout(function() {
+      var message2 = requestParams2.json;
+      request(requestParams2, function( error, response, body) {
+      });
+      
+      request('http://127.0.0.1:3000/classes/messages?order=-createdAt', function( error, response, body) {
+        var messages = JSON.parse(body).results;
+        var firstMessage = messages[0];
+        var lastMessage = messages[messages.length - 1];
+        
+        expectedFirstMessage = {
+          username: firstMessage.username,
+          message: firstMessage.message
+        };
+        expectedLastMessage = {
+          username: lastMessage.username,
+          message: lastMessage.message
+        };
+    
+        expect(expectedFirstMessage).to.eql(message2);
+        done();
+      });
+
+
+    }, 1000);
+    
+    
+  });
   //make sure the database grew appropriately after adding certain number of messages
   //
+  it('Should add correct number of messages', function(done) {
+    var startDatabaseLength;
+    request('http://127.0.0.1:3000/classes/messages?order=-createdAt', function( error, response, body) {
+      var messages = JSON.parse(body).results;
+      startDatabaseLength = messages.length;
+    });
 
+    var requestParams1 = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Jono',
+        message: 'Hello!'}
+    };
+    request(requestParams1, function( error, response, body) {
+    });
+    request(requestParams1, function( error, response, body) {
+    });
+    request(requestParams1, function( error, response, body) {
+    });
+    request(requestParams1, function( error, response, body) {
+    });
+    
+    request('http://127.0.0.1:3000/classes/messages?order=-createdAt', function( error, response, body) {
+      var messages = JSON.parse(body).results;
+      expect(messages.length).to.equal(startDatabaseLength + 4);
+      done();
+    });
+  
+    
+  });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
